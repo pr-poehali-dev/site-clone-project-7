@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 
 interface Component {
@@ -18,6 +19,22 @@ interface Component {
     padding?: string;
     textAlign?: string;
   };
+}
+
+interface Project {
+  id: string;
+  name: string;
+  components: Component[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface BlockTemplate {
+  id: string;
+  name: string;
+  category: string;
+  thumbnail: string;
+  components: Component[];
 }
 
 const componentLibrary = [
@@ -54,21 +71,295 @@ const componentLibrary = [
     label: 'Разделитель',
     icon: 'Minus',
     defaultContent: '',
-    defaultStyles: { padding: '20px' }
+    defaultStyles: { backgroundColor: '#E5E7EB', padding: '1px 0' }
   },
   {
     type: 'container',
     label: 'Контейнер',
     icon: 'Square',
-    defaultContent: 'Контейнер',
-    defaultStyles: { backgroundColor: '#f3f4f6', padding: '30px' }
+    defaultContent: '',
+    defaultStyles: { backgroundColor: '#F9FAFB', padding: '30px' }
+  }
+];
+
+const blockTemplates: BlockTemplate[] = [
+  {
+    id: 'hero-1',
+    name: 'Герой с кнопкой',
+    category: 'hero',
+    thumbnail: '🎯',
+    components: [
+      {
+        id: 'temp-1',
+        type: 'container',
+        content: '',
+        styles: { backgroundColor: '#EEF2FF', padding: '60px 20px', textAlign: 'center' }
+      },
+      {
+        id: 'temp-2',
+        type: 'heading',
+        content: 'Создавайте потрясающие сайты',
+        styles: { fontSize: '48px', textAlign: 'center', padding: '20px' }
+      },
+      {
+        id: 'temp-3',
+        type: 'text',
+        content: 'Профессиональный конструктор для ваших идей',
+        styles: { fontSize: '20px', textAlign: 'center', padding: '15px', textColor: '#6B7280' }
+      },
+      {
+        id: 'temp-4',
+        type: 'button',
+        content: 'Начать бесплатно',
+        styles: { backgroundColor: '#2563EB', textColor: '#ffffff', padding: '16px 32px', textAlign: 'center' }
+      }
+    ]
+  },
+  {
+    id: 'features-1',
+    name: 'Три преимущества',
+    category: 'features',
+    thumbnail: '⭐',
+    components: [
+      {
+        id: 'temp-5',
+        type: 'container',
+        content: '',
+        styles: { backgroundColor: '#ffffff', padding: '40px 20px' }
+      },
+      {
+        id: 'temp-6',
+        type: 'heading',
+        content: '🚀 Быстро',
+        styles: { fontSize: '24px', textAlign: 'center', padding: '15px' }
+      },
+      {
+        id: 'temp-7',
+        type: 'text',
+        content: 'Создавайте сайты за минуты',
+        styles: { fontSize: '16px', textAlign: 'center', padding: '10px' }
+      },
+      {
+        id: 'temp-8',
+        type: 'heading',
+        content: '💎 Красиво',
+        styles: { fontSize: '24px', textAlign: 'center', padding: '15px' }
+      },
+      {
+        id: 'temp-9',
+        type: 'text',
+        content: 'Профессиональный дизайн',
+        styles: { fontSize: '16px', textAlign: 'center', padding: '10px' }
+      },
+      {
+        id: 'temp-10',
+        type: 'heading',
+        content: '⚡ Мощно',
+        styles: { fontSize: '24px', textAlign: 'center', padding: '15px' }
+      },
+      {
+        id: 'temp-11',
+        type: 'text',
+        content: 'Все необходимые инструменты',
+        styles: { fontSize: '16px', textAlign: 'center', padding: '10px' }
+      }
+    ]
+  },
+  {
+    id: 'cta-1',
+    name: 'Призыв к действию',
+    category: 'cta',
+    thumbnail: '🎁',
+    components: [
+      {
+        id: 'temp-12',
+        type: 'container',
+        content: '',
+        styles: { backgroundColor: '#1E40AF', padding: '50px 20px', textAlign: 'center' }
+      },
+      {
+        id: 'temp-13',
+        type: 'heading',
+        content: 'Готовы начать?',
+        styles: { fontSize: '36px', textAlign: 'center', padding: '20px', textColor: '#ffffff' }
+      },
+      {
+        id: 'temp-14',
+        type: 'text',
+        content: 'Присоединяйтесь к тысячам пользователей',
+        styles: { fontSize: '18px', textAlign: 'center', padding: '15px', textColor: '#DBEAFE' }
+      },
+      {
+        id: 'temp-15',
+        type: 'button',
+        content: 'Начать сейчас',
+        styles: { backgroundColor: '#ffffff', textColor: '#1E40AF', padding: '16px 32px', textAlign: 'center' }
+      }
+    ]
+  },
+  {
+    id: 'testimonial-1',
+    name: 'Отзыв',
+    category: 'testimonials',
+    thumbnail: '💬',
+    components: [
+      {
+        id: 'temp-16',
+        type: 'container',
+        content: '',
+        styles: { backgroundColor: '#F9FAFB', padding: '40px 20px' }
+      },
+      {
+        id: 'temp-17',
+        type: 'text',
+        content: '"Лучший конструктор, который я использовал!"',
+        styles: { fontSize: '20px', textAlign: 'center', padding: '15px', textColor: '#374151' }
+      },
+      {
+        id: 'temp-18',
+        type: 'text',
+        content: '— Иван Петров, CEO',
+        styles: { fontSize: '14px', textAlign: 'center', padding: '10px', textColor: '#6B7280' }
+      }
+    ]
+  },
+  {
+    id: 'contact-1',
+    name: 'Форма контактов',
+    category: 'contact',
+    thumbnail: '📧',
+    components: [
+      {
+        id: 'temp-19',
+        type: 'container',
+        content: '',
+        styles: { backgroundColor: '#ffffff', padding: '40px 20px' }
+      },
+      {
+        id: 'temp-20',
+        type: 'heading',
+        content: 'Свяжитесь с нами',
+        styles: { fontSize: '32px', textAlign: 'center', padding: '20px' }
+      },
+      {
+        id: 'temp-21',
+        type: 'text',
+        content: 'Email: info@example.com | Телефон: +7 (999) 123-45-67',
+        styles: { fontSize: '16px', textAlign: 'center', padding: '15px', textColor: '#6B7280' }
+      },
+      {
+        id: 'temp-22',
+        type: 'button',
+        content: 'Написать нам',
+        styles: { backgroundColor: '#10B981', textColor: '#ffffff', padding: '14px 28px', textAlign: 'center' }
+      }
+    ]
+  },
+  {
+    id: 'footer-1',
+    name: 'Подвал',
+    category: 'footer',
+    thumbnail: '🔗',
+    components: [
+      {
+        id: 'temp-23',
+        type: 'container',
+        content: '',
+        styles: { backgroundColor: '#1F2937', padding: '40px 20px' }
+      },
+      {
+        id: 'temp-24',
+        type: 'text',
+        content: '© 2025 Ваша Компания. Все права защищены.',
+        styles: { fontSize: '14px', textAlign: 'center', padding: '10px', textColor: '#9CA3AF' }
+      },
+      {
+        id: 'temp-25',
+        type: 'text',
+        content: 'О нас | Контакты | Политика конфиденциальности',
+        styles: { fontSize: '14px', textAlign: 'center', padding: '10px', textColor: '#9CA3AF' }
+      }
+    ]
   }
 ];
 
 export default function Builder() {
   const [components, setComponents] = useState<Component[]>([]);
   const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
-  const [draggedOver, setDraggedOver] = useState<string | null>(null);
+  const [draggedComponent, setDraggedComponent] = useState<string | null>(null);
+  const [showProjectManager, setShowProjectManager] = useState(false);
+  const [showBlockLibrary, setShowBlockLibrary] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [currentProject, setCurrentProject] = useState<Project | null>(null);
+  const [projectName, setProjectName] = useState('Мой проект');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  useEffect(() => {
+    const savedProjects = localStorage.getItem('builder-projects');
+    if (savedProjects) {
+      const parsed = JSON.parse(savedProjects);
+      setProjects(parsed);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentProject) {
+      const timer = setTimeout(() => {
+        saveProject();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [components, projectName]);
+
+  const saveProject = () => {
+    const updatedProject: Project = {
+      id: currentProject?.id || Date.now().toString(),
+      name: projectName,
+      components: components,
+      createdAt: currentProject?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const updatedProjects = currentProject
+      ? projects.map(p => p.id === currentProject.id ? updatedProject : p)
+      : [...projects, updatedProject];
+
+    setProjects(updatedProjects);
+    setCurrentProject(updatedProject);
+    localStorage.setItem('builder-projects', JSON.stringify(updatedProjects));
+  };
+
+  const createNewProject = () => {
+    const newProject: Project = {
+      id: Date.now().toString(),
+      name: 'Новый проект',
+      components: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setCurrentProject(newProject);
+    setProjectName(newProject.name);
+    setComponents([]);
+    setShowProjectManager(false);
+  };
+
+  const loadProject = (project: Project) => {
+    setCurrentProject(project);
+    setProjectName(project.name);
+    setComponents(project.components);
+    setShowProjectManager(false);
+  };
+
+  const deleteProject = (projectId: string) => {
+    const updatedProjects = projects.filter(p => p.id !== projectId);
+    setProjects(updatedProjects);
+    localStorage.setItem('builder-projects', JSON.stringify(updatedProjects));
+    if (currentProject?.id === projectId) {
+      setCurrentProject(null);
+      setComponents([]);
+      setProjectName('Мой проект');
+    }
+  };
 
   const addComponent = (type: string) => {
     const library = componentLibrary.find(c => c.type === type);
@@ -82,226 +373,252 @@ export default function Builder() {
     };
 
     setComponents([...components, newComponent]);
-    setSelectedComponent(newComponent.id);
+  };
+
+  const addBlockTemplate = (template: BlockTemplate) => {
+    const newComponents = template.components.map(comp => ({
+      ...comp,
+      id: Date.now().toString() + Math.random()
+    }));
+    setComponents([...components, ...newComponents]);
+    setShowBlockLibrary(false);
   };
 
   const updateComponent = (id: string, updates: Partial<Component>) => {
-    setComponents(components.map(c => 
-      c.id === id ? { ...c, ...updates } : c
-    ));
-  };
-
-  const updateComponentStyle = (id: string, styleName: string, value: string) => {
-    setComponents(components.map(c => 
-      c.id === id ? { ...c, styles: { ...c.styles, [styleName]: value } } : c
-    ));
+    setComponents(components.map(c => c.id === id ? { ...c, ...updates } : c));
   };
 
   const deleteComponent = (id: string) => {
     setComponents(components.filter(c => c.id !== id));
-    if (selectedComponent === id) {
-      setSelectedComponent(null);
-    }
+    setSelectedComponent(null);
   };
 
-  const moveComponent = (fromIndex: number, toIndex: number) => {
+  const handleDragStart = (id: string) => {
+    setDraggedComponent(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedComponent) return;
+
+    const draggedIndex = components.findIndex(c => c.id === draggedComponent);
+    const targetIndex = components.findIndex(c => c.id === targetId);
+
+    if (draggedIndex === -1 || targetIndex === -1) return;
+
     const newComponents = [...components];
-    const [removed] = newComponents.splice(fromIndex, 1);
-    newComponents.splice(toIndex, 0, removed);
+    const [removed] = newComponents.splice(draggedIndex, 1);
+    newComponents.splice(targetIndex, 0, removed);
+
     setComponents(newComponents);
-  };
-
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', index.toString());
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    setDraggedOver(components[index].id);
-  };
-
-  const handleDrop = (e: React.DragEvent, toIndex: number) => {
-    e.preventDefault();
-    const fromIndex = parseInt(e.dataTransfer.getData('text/html'));
-    moveComponent(fromIndex, toIndex);
-    setDraggedOver(null);
-  };
-
-  const renderComponent = (component: Component) => {
-    const isSelected = selectedComponent === component.id;
-    const isDraggedOver = draggedOver === component.id;
-
-    const baseStyles = {
-      ...component.styles,
-      cursor: 'move',
-      transition: 'all 0.2s',
-      border: isSelected ? '2px solid #2563EB' : isDraggedOver ? '2px dashed #2563EB' : '2px solid transparent',
-      position: 'relative' as const,
-      minHeight: '40px'
-    };
-
-    switch (component.type) {
-      case 'heading':
-        return (
-          <h2 style={baseStyles}>
-            {component.content}
-          </h2>
-        );
-      case 'text':
-        return (
-          <p style={baseStyles}>
-            {component.content}
-          </p>
-        );
-      case 'button':
-        return (
-          <div style={{ ...baseStyles, display: 'inline-block', borderRadius: '8px' }}>
-            {component.content}
-          </div>
-        );
-      case 'image':
-        return (
-          <div style={baseStyles}>
-            <img 
-              src={component.content} 
-              alt="Component" 
-              style={{ maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
-            />
-          </div>
-        );
-      case 'divider':
-        return (
-          <div style={baseStyles}>
-            <hr style={{ border: 'none', borderTop: '2px solid #e5e7eb', margin: '0' }} />
-          </div>
-        );
-      case 'container':
-        return (
-          <div style={{ ...baseStyles, borderRadius: '8px' }}>
-            {component.content}
-          </div>
-        );
-      default:
-        return null;
-    }
+    setDraggedComponent(null);
   };
 
   const selected = components.find(c => c.id === selectedComponent);
+  const categories = ['all', 'hero', 'features', 'cta', 'testimonials', 'contact', 'footer'];
+  const categoryLabels: Record<string, string> = {
+    all: 'Все',
+    hero: 'Герои',
+    features: 'Преимущества',
+    cta: 'Призывы',
+    testimonials: 'Отзывы',
+    contact: 'Контакты',
+    footer: 'Подвалы'
+  };
+
+  const filteredBlocks = selectedCategory === 'all' 
+    ? blockTemplates 
+    : blockTemplates.filter(b => b.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
-              <Icon name="ArrowLeft" size={20} />
-            </Button>
-            <div className="flex items-center gap-2">
-              <Icon name="Layout" className="text-primary" size={24} />
-              <span className="text-xl font-bold">Конструктор сайтов</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Icon name="Save" size={14} />
-              Сохранено
-            </Badge>
-            <Button variant="outline" size="sm">
-              <Icon name="Eye" className="mr-2" size={16} />
-              Предпросмотр
-            </Button>
-            <Button size="sm">
-              <Icon name="Rocket" className="mr-2" size={16} />
-              Опубликовать
-            </Button>
-          </div>
+    <div className="h-screen flex flex-col bg-gray-50">
+      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={() => window.location.href = '/'}>
+            <Icon name="ArrowLeft" size={18} />
+          </Button>
+          <Input 
+            value={projectName} 
+            onChange={(e) => setProjectName(e.target.value)}
+            className="font-semibold text-lg border-none focus-visible:ring-0 w-64"
+          />
+          <Badge variant="outline" className="text-xs">
+            {currentProject ? 'Сохранено' : 'Не сохранено'}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowProjectManager(true)}>
+            <Icon name="FolderOpen" size={18} className="mr-2" />
+            Проекты
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setShowBlockLibrary(true)}>
+            <Icon name="Layout" size={18} className="mr-2" />
+            Блоки
+          </Button>
+          <Button variant="outline" size="sm">
+            <Icon name="Eye" size={18} className="mr-2" />
+            Предпросмотр
+          </Button>
+          <Button size="sm">
+            <Icon name="Upload" size={18} className="mr-2" />
+            Опубликовать
+          </Button>
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-73px)]">
-        <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+      <div className="flex-1 flex overflow-hidden">
+        <aside className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
           <div className="p-4">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Icon name="Package" size={18} />
-              Компоненты
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Компоненты</h3>
             <div className="space-y-2">
               {componentLibrary.map((comp) => (
-                <Button
+                <Card
                   key={comp.type}
-                  variant="outline"
-                  className="w-full justify-start"
+                  className="p-3 cursor-pointer hover:bg-gray-50 transition-colors"
                   onClick={() => addComponent(comp.type)}
                 >
-                  <Icon name={comp.icon as any} className="mr-2" size={18} />
-                  {comp.label}
-                </Button>
+                  <div className="flex items-center gap-3">
+                    <Icon name={comp.icon as any} size={20} className="text-primary" />
+                    <span className="text-sm font-medium">{comp.label}</span>
+                  </div>
+                </Card>
               ))}
             </div>
           </div>
-        </div>
+        </aside>
 
-        <div className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg min-h-[600px] p-8">
+        <main className="flex-1 overflow-y-auto p-8 bg-gray-100">
+          <div className="max-w-4xl mx-auto bg-white min-h-full shadow-lg rounded-lg">
             {components.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center py-20">
-                <Icon name="MousePointer" size={64} className="text-gray-300 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Начните создавать
-                </h3>
-                <p className="text-gray-600 mb-6 max-w-md">
-                  Выберите компоненты слева и перетаскивайте их для создания вашего сайта
-                </p>
-                <Button onClick={() => addComponent('heading')}>
-                  <Icon name="Plus" className="mr-2" size={18} />
-                  Добавить первый компонент
+              <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+                <Icon name="MousePointer" size={48} className="mb-4" />
+                <p className="text-lg">Выберите компонент слева или добавьте готовый блок</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => setShowBlockLibrary(true)}
+                >
+                  <Icon name="Layout" size={18} className="mr-2" />
+                  Открыть библиотеку блоков
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2">
-                {components.map((component, index) => (
+              <div>
+                {components.map((comp) => (
                   <div
-                    key={component.id}
+                    key={comp.id}
                     draggable
-                    onDragStart={(e) => handleDragStart(e, index)}
-                    onDragOver={(e) => handleDragOver(e, index)}
-                    onDrop={(e) => handleDrop(e, index)}
-                    onDragLeave={() => setDraggedOver(null)}
-                    onClick={() => setSelectedComponent(component.id)}
-                    className="relative group"
+                    onDragStart={() => handleDragStart(comp.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={() => handleDrop(comp.id)}
+                    onClick={() => setSelectedComponent(comp.id)}
+                    className={`relative group cursor-move ${
+                      selectedComponent === comp.id ? 'ring-2 ring-primary' : ''
+                    }`}
                   >
-                    {renderComponent(component)}
-                    {selectedComponent === component.id && (
-                      <div className="absolute top-2 right-2 flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteComponent(component.id);
+                    {comp.type === 'heading' && (
+                      <h1
+                        style={{
+                          backgroundColor: comp.styles.backgroundColor,
+                          color: comp.styles.textColor,
+                          fontSize: comp.styles.fontSize,
+                          padding: comp.styles.padding,
+                          textAlign: comp.styles.textAlign as any
+                        }}
+                      >
+                        {comp.content}
+                      </h1>
+                    )}
+                    {comp.type === 'text' && (
+                      <p
+                        style={{
+                          backgroundColor: comp.styles.backgroundColor,
+                          color: comp.styles.textColor,
+                          fontSize: comp.styles.fontSize,
+                          padding: comp.styles.padding,
+                          textAlign: comp.styles.textAlign as any
+                        }}
+                      >
+                        {comp.content}
+                      </p>
+                    )}
+                    {comp.type === 'button' && (
+                      <div style={{ padding: comp.styles.padding, textAlign: comp.styles.textAlign as any }}>
+                        <button
+                          style={{
+                            backgroundColor: comp.styles.backgroundColor,
+                            color: comp.styles.textColor,
+                            padding: '12px 24px',
+                            borderRadius: '6px',
+                            fontWeight: '500'
                           }}
                         >
-                          <Icon name="Trash2" size={14} />
-                        </Button>
+                          {comp.content}
+                        </button>
                       </div>
                     )}
+                    {comp.type === 'image' && (
+                      <div style={{ padding: comp.styles.padding, textAlign: comp.styles.textAlign as any }}>
+                        <img src={comp.content} alt="Component" className="max-w-full h-auto" />
+                      </div>
+                    )}
+                    {comp.type === 'divider' && (
+                      <hr
+                        style={{
+                          backgroundColor: comp.styles.backgroundColor,
+                          border: 'none',
+                          height: '2px',
+                          margin: comp.styles.padding
+                        }}
+                      />
+                    )}
+                    {comp.type === 'container' && (
+                      <div
+                        style={{
+                          backgroundColor: comp.styles.backgroundColor,
+                          padding: comp.styles.padding,
+                          minHeight: '100px'
+                        }}
+                      >
+                        {comp.content || <span className="text-gray-400">Контейнер</span>}
+                      </div>
+                    )}
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteComponent(comp.id);
+                        }}
+                      >
+                        <Icon name="Trash2" size={16} />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
+        </main>
 
-        <div className="w-80 bg-white border-l border-gray-200 overflow-y-auto">
+        <aside className="w-80 bg-white border-l border-gray-200 overflow-y-auto">
           <div className="p-4">
             {selected ? (
               <div>
-                <h3 className="font-semibold mb-4 flex items-center gap-2">
-                  <Icon name="Settings" size={18} />
-                  Настройки компонента
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-gray-700">Настройки</h3>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setSelectedComponent(null)}
+                  >
+                    <Icon name="X" size={16} />
+                  </Button>
+                </div>
 
                 <Tabs defaultValue="content" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
@@ -309,116 +626,216 @@ export default function Builder() {
                     <TabsTrigger value="style">Стиль</TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="content" className="space-y-4 mt-4">
-                    <div>
-                      <Label htmlFor="content">Содержимое</Label>
-                      {selected.type === 'image' ? (
+                  <TabsContent value="content" className="space-y-4">
+                    {selected.type !== 'divider' && selected.type !== 'container' && (
+                      <div>
+                        <Label>Содержание</Label>
                         <Input
-                          id="content"
                           value={selected.content}
-                          onChange={(e) => updateComponent(selected.id, { content: e.target.value })}
-                          placeholder="URL изображения"
-                        />
-                      ) : (
-                        <textarea
-                          id="content"
-                          className="w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                          value={selected.content}
-                          onChange={(e) => updateComponent(selected.id, { content: e.target.value })}
-                        />
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="style" className="space-y-4 mt-4">
-                    {selected.type !== 'divider' && (
-                      <>
-                        <div>
-                          <Label htmlFor="fontSize">Размер шрифта</Label>
-                          <Input
-                            id="fontSize"
-                            value={selected.styles.fontSize || '16px'}
-                            onChange={(e) => updateComponentStyle(selected.id, 'fontSize', e.target.value)}
-                            placeholder="16px"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="textColor">Цвет текста</Label>
-                          <div className="flex gap-2">
-                            <Input
-                              id="textColor"
-                              type="color"
-                              value={selected.styles.textColor || '#000000'}
-                              onChange={(e) => updateComponentStyle(selected.id, 'textColor', e.target.value)}
-                              className="w-20"
-                            />
-                            <Input
-                              value={selected.styles.textColor || '#000000'}
-                              onChange={(e) => updateComponentStyle(selected.id, 'textColor', e.target.value)}
-                              placeholder="#000000"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="textAlign">Выравнивание</Label>
-                          <div className="flex gap-2">
-                            {['left', 'center', 'right'].map((align) => (
-                              <Button
-                                key={align}
-                                variant={selected.styles.textAlign === align ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => updateComponentStyle(selected.id, 'textAlign', align)}
-                                className="flex-1"
-                              >
-                                <Icon name={`Align${align.charAt(0).toUpperCase() + align.slice(1)}` as any} size={16} />
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    <div>
-                      <Label htmlFor="backgroundColor">Фон</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="backgroundColor"
-                          type="color"
-                          value={selected.styles.backgroundColor || '#ffffff'}
-                          onChange={(e) => updateComponentStyle(selected.id, 'backgroundColor', e.target.value)}
-                          className="w-20"
-                        />
-                        <Input
-                          value={selected.styles.backgroundColor || '#ffffff'}
-                          onChange={(e) => updateComponentStyle(selected.id, 'backgroundColor', e.target.value)}
-                          placeholder="#ffffff"
+                          onChange={(e) =>
+                            updateComponent(selected.id, { content: e.target.value })
+                          }
+                          placeholder="Введите текст"
                         />
                       </div>
-                    </div>
+                    )}
+                  </TabsContent>
 
+                  <TabsContent value="style" className="space-y-4">
                     <div>
-                      <Label htmlFor="padding">Отступы</Label>
+                      <Label>Цвет фона</Label>
                       <Input
-                        id="padding"
-                        value={selected.styles.padding || '10px'}
-                        onChange={(e) => updateComponentStyle(selected.id, 'padding', e.target.value)}
-                        placeholder="10px"
+                        type="color"
+                        value={selected.styles.backgroundColor || '#ffffff'}
+                        onChange={(e) =>
+                          updateComponent(selected.id, {
+                            styles: { ...selected.styles, backgroundColor: e.target.value }
+                          })
+                        }
                       />
                     </div>
+                    {selected.type !== 'divider' && (
+                      <div>
+                        <Label>Цвет текста</Label>
+                        <Input
+                          type="color"
+                          value={selected.styles.textColor || '#000000'}
+                          onChange={(e) =>
+                            updateComponent(selected.id, {
+                              styles: { ...selected.styles, textColor: e.target.value }
+                            })
+                          }
+                        />
+                      </div>
+                    )}
+                    {(selected.type === 'heading' || selected.type === 'text') && (
+                      <div>
+                        <Label>Размер текста</Label>
+                        <Input
+                          value={selected.styles.fontSize || '16px'}
+                          onChange={(e) =>
+                            updateComponent(selected.id, {
+                              styles: { ...selected.styles, fontSize: e.target.value }
+                            })
+                          }
+                          placeholder="16px"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <Label>Отступы</Label>
+                      <Input
+                        value={selected.styles.padding || '0'}
+                        onChange={(e) =>
+                          updateComponent(selected.id, {
+                            styles: { ...selected.styles, padding: e.target.value }
+                          })
+                        }
+                        placeholder="20px"
+                      />
+                    </div>
+                    {selected.type !== 'divider' && (
+                      <div>
+                        <Label>Выравнивание</Label>
+                        <Select
+                          value={selected.styles.textAlign || 'left'}
+                          onValueChange={(value) =>
+                            updateComponent(selected.id, {
+                              styles: { ...selected.styles, textAlign: value }
+                            })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="left">Слева</SelectItem>
+                            <SelectItem value="center">По центру</SelectItem>
+                            <SelectItem value="right">Справа</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </TabsContent>
                 </Tabs>
               </div>
             ) : (
-              <div className="text-center text-gray-500 mt-8">
-                <Icon name="MousePointer" size={48} className="mx-auto mb-4 text-gray-300" />
-                <p>Выберите компонент<br />для настройки</p>
+              <div className="text-center text-gray-400 mt-8">
+                <Icon name="MousePointer" size={48} className="mx-auto mb-2" />
+                <p>Выберите компонент для редактирования</p>
               </div>
             )}
           </div>
-        </div>
+        </aside>
       </div>
+
+      {showProjectManager && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-4xl max-h-[80vh] overflow-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Мои проекты</h2>
+                <Button variant="ghost" onClick={() => setShowProjectManager(false)}>
+                  <Icon name="X" size={20} />
+                </Button>
+              </div>
+
+              <Button onClick={createNewProject} className="mb-6 w-full">
+                <Icon name="Plus" size={18} className="mr-2" />
+                Создать новый проект
+              </Button>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {projects.map((project) => (
+                  <Card key={project.id} className="p-4 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-lg">{project.name}</h3>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteProject(project.id);
+                        }}
+                      >
+                        <Icon name="Trash2" size={16} />
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-500 mb-3">
+                      {project.components.length} компонентов
+                    </p>
+                    <p className="text-xs text-gray-400 mb-3">
+                      Обновлён: {new Date(project.updatedAt).toLocaleDateString('ru-RU')}
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => loadProject(project)}
+                    >
+                      Открыть
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+
+              {projects.length === 0 && (
+                <div className="text-center text-gray-400 py-12">
+                  <Icon name="FolderOpen" size={48} className="mx-auto mb-4" />
+                  <p>У вас пока нет сохранённых проектов</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {showBlockLibrary && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-6xl max-h-[85vh] overflow-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Библиотека готовых блоков</h2>
+                <Button variant="ghost" onClick={() => setShowBlockLibrary(false)}>
+                  <Icon name="X" size={20} />
+                </Button>
+              </div>
+
+              <div className="flex gap-2 mb-6 flex-wrap">
+                {categories.map((cat) => (
+                  <Button
+                    key={cat}
+                    variant={selectedCategory === cat ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedCategory(cat)}
+                  >
+                    {categoryLabels[cat]}
+                  </Button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredBlocks.map((block) => (
+                  <Card
+                    key={block.id}
+                    className="p-4 cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                    onClick={() => addBlockTemplate(block)}
+                  >
+                    <div className="text-5xl mb-3 text-center">{block.thumbnail}</div>
+                    <h3 className="font-semibold text-center mb-2">{block.name}</h3>
+                    <p className="text-xs text-gray-500 text-center mb-3">
+                      {block.components.length} компонентов
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      <Icon name="Plus" size={16} className="mr-2" />
+                      Добавить
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

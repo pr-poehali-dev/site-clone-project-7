@@ -170,7 +170,7 @@ export default function Index() {
               <a href="#examples" className="text-gray-700 hover:text-primary transition-colors">
                 Примеры
               </a>
-              <Button variant="outline">Войти</Button>
+              <Button variant="outline" onClick={() => window.location.href = 'https://alltrades.ru/cp/?show=login'}>Войти</Button>
               <Button>Начать бесплатно</Button>
             </div>
 
@@ -197,7 +197,7 @@ export default function Index() {
                 <a href="#examples" className="text-gray-700 hover:text-primary transition-colors">
                   Примеры
                 </a>
-                <Button variant="outline" className="w-full">Войти</Button>
+                <Button variant="outline" className="w-full" onClick={() => window.location.href = 'https://alltrades.ru/cp/?show=login'}>Войти</Button>
                 <Button className="w-full">Начать бесплатно</Button>
               </div>
             </div>
