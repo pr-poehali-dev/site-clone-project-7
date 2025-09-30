@@ -219,11 +219,11 @@ export default function Index() {
             готовыми шаблонами и мощными инструментами
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="text-lg px-8 transition-transform hover:scale-105">
+            <Button size="lg" className="text-lg px-8 transition-transform hover:scale-105" onClick={() => window.location.href = '/builder'}>
               <Icon name="Rocket" className="mr-2" size={20} />
               Начать создавать
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 transition-transform hover:scale-105">
+            <Button size="lg" variant="outline" className="text-lg px-8 transition-transform hover:scale-105" onClick={() => window.location.href = '/builder'}>
               <Icon name="Play" className="mr-2" size={20} />
               Смотреть демо
             </Button>
