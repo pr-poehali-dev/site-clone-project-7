@@ -128,6 +128,82 @@ export default function Builder() {
     setDraggedOver(null);
   };
 
+  const exportToHTML = () => {
+    let htmlContent = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мой проект</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      font-size: inherit;
+    }
+  </style>
+</head>
+<body>
+`;
+
+    components.forEach((comp) => {
+      const styles = `background-color: ${comp.styles.backgroundColor || 'transparent'}; color: ${comp.styles.textColor || '#000000'}; font-size: ${comp.styles.fontSize || '16px'}; padding: ${comp.styles.padding || '0'}; text-align: ${comp.styles.textAlign || 'left'};`;
+
+      switch (comp.type) {
+        case 'heading':
+          htmlContent += `  <h1 style="${styles}">${comp.content}</h1>\n`;
+          break;
+        case 'text':
+          htmlContent += `  <p style="${styles}">${comp.content}</p>\n`;
+          break;
+        case 'button':
+          htmlContent += `  <div style="padding: ${comp.styles.padding || '0'}; text-align: ${comp.styles.textAlign || 'left'};">
+    <button style="background-color: ${comp.styles.backgroundColor || '#2563EB'}; color: ${comp.styles.textColor || '#ffffff'}; padding: 12px 24px; border-radius: 6px; font-weight: 500;">${comp.content}</button>
+  </div>\n`;
+          break;
+        case 'image':
+          htmlContent += `  <div style="padding: ${comp.styles.padding || '0'}; text-align: ${comp.styles.textAlign || 'center'};">
+    <img src="${comp.content}" alt="Image">
+  </div>\n`;
+          break;
+        case 'divider':
+          htmlContent += `  <hr style="background-color: ${comp.styles.backgroundColor || '#E5E7EB'}; border: none; height: 2px; margin: ${comp.styles.padding || '20px 0'};">\n`;
+          break;
+        case 'container':
+          htmlContent += `  <div style="${styles} min-height: 100px;">${comp.content || ''}</div>\n`;
+          break;
+      }
+    });
+
+    htmlContent += `</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'my-project.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const renderComponent = (component: Component) => {
     const isSelected = selectedComponent === component.id;
     const isDraggedOver = draggedOver === component.id;
@@ -208,6 +284,10 @@ export default function Builder() {
               <Icon name="Save" size={14} />
               Сохранено
             </Badge>
+            <Button variant="outline" size="sm" onClick={exportToHTML}>
+              <Icon name="Download" className="mr-2" size={16} />
+              Скачать HTML
+            </Button>
             <Button variant="outline" size="sm">
               <Icon name="Eye" className="mr-2" size={16} />
               Предпросмотр
