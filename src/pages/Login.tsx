@@ -26,7 +26,7 @@ export default function Login() {
       });
 
       if (response.ok) {
-        window.location.href = 'https://alltrades.ru/cp/';
+        window.location.href = '/dashboard';
       }
     } catch (error) {
       console.error('Login error:', error);
